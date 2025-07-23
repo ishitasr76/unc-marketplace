@@ -12,7 +12,7 @@ export default function Home() {
     <section className="flex flex-col items-center justify-center gap-8 py-16">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
         <h1 className="text-4xl font-bold text-blue-800 mb-4">
-          {name ? `${name}, welcome to UNC Marketplace!` : "Welcome to UNC Marketplace!"}
+          {name ? `${name}, Welcome to UNC Marketplace!` : "Welcome to UNC Marketplace!"}
         </h1>
         <p className="text-lg text-gray-700 mb-6">
           The easiest way for UNC students to buy and sell dorm essentials, supplies, textbooks, clothes, and more.

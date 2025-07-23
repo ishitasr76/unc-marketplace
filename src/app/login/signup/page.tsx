@@ -22,6 +22,7 @@ export default function SignupPage() {
       if (error) throw error;
       return data;
     },
+    //after succesful sign up, it redirects them to the login page so the user can log into the application.
     onSuccess: (data) => {
       setSuccess("Signup successful! Please check your email to confirm your account.");
       setTimeout(() => {

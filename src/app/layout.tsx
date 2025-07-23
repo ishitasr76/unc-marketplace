@@ -1,15 +1,17 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import "./globals.css";
 import QueryProvider from "./QueryProvider";
-
-export const metadata = {
-  title: "UNC Marketplace",
-  description: "Buy and sell items with fellow UNC students.",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
+import { useSearchParams } from "next/navigation";
+// export const metadata = {
+//   title: "UNC Marketplace",
+//   description: "Buy and sell items with fellow UNC students.",
+// };
+export default function RootLayout({ children }: { children: React.ReactNode, searchParams: { name: string } }) {
+  
+  const searchParams = useSearchParams();
+  const name = searchParams.get("name");  return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-blue-50">
         <QueryProvider>
@@ -21,7 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/category/supplies" className="hover:underline">Supplies</Link>
                 <Link href="/category/class-notes" className="hover:underline">Class Notes</Link>
                 <Link href="/category/clothes" className="hover:underline">Clothes</Link>
-                <Link href="/login" className="hover:underline">Login</Link>
+                {name ? (
+                  <span className="hover:underline font-bold">{name}</span>
+                ) : (
+                  <Link href="/login" className="hover:underline">Login</Link>
+                )}
               </div>
             </nav>
           </header>
