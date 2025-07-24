@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
+import { unique } from "next/dist/build/utils";
 
 export default function PostItemPage() {
   const [form, setForm] = useState({
@@ -50,9 +51,59 @@ export default function PostItemPage() {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("Form submitted! (No backend logic yet)");
+  
+    try {
+      // Upload the picture to Supabase Storage
+      let pictureUrl = null;
+      if (form.picture) {
+        const { data, error } = await supabase.storage
+          .from("item-images") // Replace with your storage bucket name
+          .upload(`pictures/${Date.now()}_${form.picture.name}`, form.picture);
+  
+        if (error) {
+          throw error;
+        }
+        console.log(data)
+        pictureUrl = data?.fullPath;
+      }
+  
+      // Insert the item into the Items table
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        throw authError;
+      }
+      const userUID = user?.id|| "anonymous";
+      console.log("User UID:", user);
+      const { error } = await supabase.from("Items").insert([
+        {
+          user_id: userUID,
+          user_name: user?.user_metadata.full_name || "n/a",
+          item_name: form.name,
+          item_category: (document.getElementById("categories") as HTMLSelectElement).value, // Get selected category
+          item_price: parseFloat(form.price),
+          item_picture: pictureUrl, // Save the picture URL
+          item_description: form.description,
+          uploaded_date_time: new Date().toISOString().split("T").join(" ").slice(0, -5)
+        },
+      ]);
+  
+      if (error) {
+        throw error;
+      }
+  
+      alert("Item posted successfully!");
+      setForm({
+        name: "",
+        price: "",
+        picture: null,
+        description: "",
+      });
+    } catch (error) {
+      console.error("Error posting item:", error);
+      alert("Failed to post item. Please try again.");
+    }
   };
 
   return (
@@ -71,6 +122,14 @@ export default function PostItemPage() {
               className="border rounded px-3 py-2"
               placeholder="e.g. Mini Fridge"
             />
+            <span className="font-medium">Category</span>
+            <select name="categories" id="categories" className="border rounded px-3 py-2"  required>
+              {/* <option value="" disabled selected>Select a category</option> */}
+              <option value="dorm-stuff">Dorm Stuff</option>
+              <option value="supplies">Supplies</option>
+              <option value="class-notes">Class Notes</option>
+              <option value="clothes">Clothes</option>
+            </select>
           </label>
           <label className="flex flex-col gap-1">
             <span className="font-medium">Price ($)</span>
@@ -94,7 +153,6 @@ export default function PostItemPage() {
               accept="image/*"
               onChange={handleChange}
               ref={fileInputRef}
-              required
               className="hidden"
             />
             <button

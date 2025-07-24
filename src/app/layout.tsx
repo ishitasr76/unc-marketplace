@@ -1,17 +1,45 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import "./globals.css";
 import QueryProvider from "./QueryProvider";
-import { useSearchParams } from "next/navigation";
-// export const metadata = {
-//   title: "UNC Marketplace",
-//   description: "Buy and sell items with fellow UNC students.",
-// };
+import { supabase } from "@/utils/supabase/client";
+
 export default function RootLayout({ children }: { children: React.ReactNode, searchParams: { name: string } }) {
-  
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name");  return (
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          console.error("Authentication error:", authError.message);
+          return null;
+        }
+        const fullName = user?.user_metadata.full_name || null;
+        setName(fullName); // Update state immediately
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        setName(null); // Ensure state is updated even on error
+      }
+    }
+
+    // Fetch user only if authentication is available
+    if (supabase.auth) {
+      fetchUser();
+    }
+  }, []);
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    } else {
+      window.location.href = "/login"; // Redirect to login page after sign-out
+    }
+  }
+
+  return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-blue-50">
         <QueryProvider>
@@ -24,7 +52,15 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
                 <Link href="/category/class-notes" className="hover:underline">Class Notes</Link>
                 <Link href="/category/clothes" className="hover:underline">Clothes</Link>
                 {name ? (
-                  <span className="hover:underline font-bold">{name}</span>
+                  <div className="flex items-center gap-2">
+                    <Link href = "/user-info" className="hover:underline font-bold">{name}</Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="hover:underline text-sm bg-blue-500 text-white px-2 py-1 rounded"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 ) : (
                   <Link href="/login" className="hover:underline">Login</Link>
                 )}

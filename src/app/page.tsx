@@ -1,13 +1,33 @@
-//needs to be marked like this because the child of this page uses a use state hook in the code.
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { supabase } from "@/utils/supabase/client";
 
 export default function Home() {
-  const searchParams = useSearchParams();
-  const name = searchParams.get("name");
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          console.error("Authentication error:", authError.message);
+          return null;
+        }
+        return user?.user_metadata.full_name || null;
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        return null;
+      }
+    }
+
+    // Fetch user only if authentication is available
+    if (supabase.auth) {
+      fetchUser().then((userName) => setName(userName));
+    }
+  }, []);
+
   return (
     <section className="flex flex-col items-center justify-center gap-8 py-16">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
@@ -33,7 +53,7 @@ export default function Home() {
         </Link>
         <Link href="/category/class-notes" className="bg-blue-100 rounded-lg p-4 text-center">
           <h2 className="font-semibold text-blue-700 mb-2">Class Notes</h2>
-          <p className="text-gray-600 text-sm">Buy or sell class notes and textooks for your UNC classes.</p>
+          <p className="text-gray-600 text-sm">Buy or sell class notes and textbooks for your UNC classes.</p>
         </Link>
         <Link href="/category/clothes" className="bg-blue-100 rounded-lg p-4 text-center">
           <h2 className="font-semibold text-blue-700 mb-2">Clothes</h2>

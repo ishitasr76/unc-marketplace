@@ -25,8 +25,8 @@ export default function LoginPage() {
       // Get user's name from user_metadata.full_name
       const user = data.user;
       const name = user?.user_metadata?.full_name || user?.email || "User";
-      // Redirect to home with name as query param
-      router.push(`/?name=${encodeURIComponent(name)}`);
+      // Redirect to home and reload the page
+      window.location.href = "/";
     },
     onError: (error: any) => {
       setLoginError(error.message || "Login failed");
