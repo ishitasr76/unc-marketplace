@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useUser } from "../../UserContext";
 
 export default function SignupPage() {
+
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   const [success, setSuccess] = useState("");
   const router = useRouter();
@@ -24,7 +26,22 @@ export default function SignupPage() {
     },
     //after succesful sign up, it redirects them to the login page so the user can log into the application.
     onSuccess: (data) => {
-      setSuccess("Signup successful! Please check your email to confirm your account.");
+      setSuccess("Signup successful!");
+      const current_user = data.user || null;
+      async function addToUserTable() {   
+        await supabase.from('UserStats').insert([{
+          user_id: current_user?.id,
+          user_name: current_user?.user_metadata.full_name || null,
+          user_email: current_user?.email,
+          items_sold: 0,
+          items_bought: 0,
+          total_money_spent_on_app: 0,
+          total_money_made_on_app: 0,
+          member_since: new Date().toISOString().split('T')[0]
+        }]);
+      }
+      addToUserTable();
+      console.log ("user added to user table");
       setTimeout(() => {
         router.push("/login");
       }, 2000); // Redirect after 2 seconds
@@ -45,7 +62,7 @@ export default function SignupPage() {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center py-16">
+      <section className="flex flex-col items-center justify-center py-16">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
         <h1 className="text-2xl font-bold mb-6 text-center" style={{ color: "#7BAFD4" }}>Sign Up</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

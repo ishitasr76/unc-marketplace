@@ -1,14 +1,87 @@
-import React from "react";
-
+"use client";
+import React, { use, useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase/client";
+interface Item {
+  item_id: number; 
+  item_name: string;
+  item_category: string;
+  item_price: string;
+  item_picture?: string;
+  item_description: string;
+  uploaded_date_time: string; //check if it should be string or date for (type)
+  user_id: string;
+  user_name: string;
+}
 export default function ClothesPage() {
+  const [items, setItems] = useState<Item[]>([]);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      const { data, error } = await supabase
+        .from("Items")
+        .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name")
+        .eq("item_category", "clothes"); // Filter by category
+
+      if (error) {
+        console.error("Error fetching items:", error);
+      } else {
+        setItems(data || []);
+      }
+    };
+
+    fetchItems();
+  }, []);
+  console.log ("Clothes Items:", items);
+
   return (
     <section className="flex flex-col items-center justify-center gap-8 py-16">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
-        <h1 className="text-4xl font-bold text-blue-800 mb-4">Clothes</h1>
+        <h1 className="text-4xl font-bold text-blue-300 mb-4">Clothes</h1>
         <p className="text-lg text-gray-700 mb-6">
           UNC gear, seasonal wear, and more clothing items.
         </p>
       </div>
+      <div className="flex flex-wrap justify-start w-full">
+        {items.length > 0 ? (
+          items.map((item) => (
+            <div
+              className="bg-white rounded-lg shadow-md p-4 text-left w-15/48 m-2"
+              key={item.item_id}
+            >
+              <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-blue-300">
+                {item.item_name}
+              </h2>
+              <p className="text-gray-700 text-lg">${item.item_price}</p>
+              </div>
+                {item.item_picture && (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${item.item_picture}`}
+                  alt={item.item_name}
+                  className="mt-1 w-full h-48 object-cover rounded-lg"
+                />
+              )}
+                <p className="text-gray-500 mt-1">{item.item_description}</p>
+
+              <div className="flex justify-around items-center" >
+              <h1 className="text-sm text-gray-500"> 
+                Sold by <span className="text-blue-300">
+                  {item.user_name}
+                </span>
+              </h1>
+              <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
+                     Add to Cart
+                    </button>
+              <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
+                Buy Now
+              </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No clothing items found.</p>
+        )}
+      </div>
     </section>
   );
-} 
+}

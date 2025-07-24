@@ -80,6 +80,7 @@ export default function PostItemPage() {
         {
           user_id: userUID,
           user_name: user?.user_metadata.full_name || "n/a",
+          user_email: user?.user_metadata.email || "n/a",
           item_name: form.name,
           item_category: (document.getElementById("categories") as HTMLSelectElement).value, // Get selected category
           item_price: parseFloat(form.price),

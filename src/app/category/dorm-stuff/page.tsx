@@ -41,11 +41,11 @@ export default function DormStuffPage() {
           Beds, mini-fridges, decor, and more for your dorm room.
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="flex flex-wrap justify-start w-full">
         {items.length > 0 ? (
           items.map((item) => (
             <div
-              className="bg-white rounded-lg shadow-md p-4 text-left"
+              className="bg-white rounded-lg shadow-md p-4 text-left w-15/48 m-2"
               key={item.item_id}
             >
               <div className="flex justify-between items-center">
@@ -69,7 +69,10 @@ export default function DormStuffPage() {
                   {item.user_name}
                 </span>
               </h1>
-              <button className="mt-2 bg-blue-300 text-white px-4 py-2 rounded hover:bg-blue-400">
+              <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
+                     Add to Cart
+                </button>
+              <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
                 Buy Now
               </button>
               </div>

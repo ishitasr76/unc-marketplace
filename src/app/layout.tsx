@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import QueryProvider from "./QueryProvider";
 import { supabase } from "@/utils/supabase/client";
+import { UserProvider } from "./UserContext";
 
 export default function RootLayout({ children }: { children: React.ReactNode, searchParams: { name: string } }) {
   const [name, setName] = useState<string | null>(null);
@@ -40,7 +41,11 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
   }
 
   return (
+    <UserProvider>
     <html lang="en">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+      </head>
       <body className="min-h-screen flex flex-col bg-blue-50">
         <QueryProvider>
           <header className="bg-blue-300 text-white shadow">
@@ -53,6 +58,11 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
                 <Link href="/category/clothes" className="hover:underline">Clothes</Link>
                 {name ? (
                   <div className="flex items-center gap-2">
+                    <Link href="/cart">
+                      <span className="material-symbols-outlined">
+                        shopping_cart
+                      </span>
+                    </Link>
                     <Link href = "/user-info" className="hover:underline font-bold">{name}</Link>
                     <button
                       onClick={handleSignOut}
@@ -74,5 +84,6 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
         </QueryProvider>
       </body>
     </html>
+    </UserProvider>
   );
 }
