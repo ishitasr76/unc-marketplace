@@ -2,6 +2,7 @@
 import React, { use, useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { useUser } from "../UserContext";
+import { useRouter } from "next/navigation";
 interface Item {
   item_id: number; 
   item_name: string;
@@ -32,11 +33,13 @@ interface SoldItem {
 
 }
 
+
 export default function UserInfoPage() {
   const { current_user_id, current_user_name, current_user_email } = useUser();
   const [soldItems, setSoldItems] = useState<SoldItem[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [userStats, setUserStats] = useState<UserStats[]>([]);
+  const router = useRouter();
   useEffect(() => {
     console.log (current_user_id);
     console.log (current_user_name);
@@ -82,6 +85,9 @@ export default function UserInfoPage() {
   console.log ("User Items:", items);
   console.log ("User Stats:", userStats);
   console.log ("User Sold Items:", soldItems);
+  if (!current_user_id) {
+    return <div>Loading...</div>;
+  }
   return (
     <section className="flex row items-center justify-center gap-5" >
      
@@ -95,6 +101,12 @@ export default function UserInfoPage() {
       <p className="text-gray-600 text-lg">Total money spent on app: <span className="text-blue-300">${userStats[0]?.total_money_spent_on_app}</span></p>
       <p className="text-gray-600 text-lg">Total money made on app: <span className="text-blue-300">${userStats[0]?.total_money_made_on_app}</span></p>
       <p className="text-gray-600 text-lg">Member since: <span className="text-blue-300">{userStats[0]?.member_since}</span></p>
+      <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white "
+      onClick={() => {
+        router.push("/orders");
+      }}>
+        View Orders
+      </button>
       </div>
         {items.length > 0 ? (
           items.map((item) => (

@@ -59,6 +59,7 @@ function BuyPageContent() {
             sold_by_user_name: sellerName,
             bought_by_user_id: current_user_id,
             bought_by_user_name: current_user_name,
+            sold_by_user_email: sellerEmail,
           }
         ]);
       if (error) {

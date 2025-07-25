@@ -23,6 +23,9 @@ export default function Home() {
     }
     fetchItems();
   }, []);
+  if (!current_user_id) {
+    return <div>Loading...</div>;
+  }
 
   return (
   
@@ -106,7 +109,31 @@ export default function Home() {
                     <h4 className="text-sm text-gray-500">
                       Sold by <span className="text-blue-300">{item.user_name}</span>
                     </h4>
-                    <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
+                    <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white"
+                    onClick={async () => {
+                      const { error } = await supabase
+                      .from('InCartItems')
+                      .insert([
+                        {
+                          item_name: item.item_name,
+                          item_category: item.item_category,
+                          item_price: item.item_price,
+                          item_description: item.item_description,
+                          item_picture: item.item_picture,
+                          seller_id: item.user_id,
+                          seller_name: item.user_name,
+                          seller_email: item.user_email,
+                          buyer_id: current_user_id,
+                          all_items_db_id: item.item_id,
+                        }
+                      ])
+                      if (error) {
+                        console.error("Error adding item to cart", error);
+                      } else {
+                        alert("Item added to cart successfully");
+                        window.location.reload();
+                      }
+                    }}>
                      Add to Cart
                     </button>
               <button
@@ -128,6 +155,7 @@ export default function Home() {
                       seller_name: item.user_name,
                       seller_id:item.user_id,
                       seller_email: item.user_email || '',
+
                     });
                     router.push(`/buy?${params.toString()}`);
                   }
