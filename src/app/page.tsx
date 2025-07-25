@@ -112,7 +112,12 @@ export default function Home() {
               <button
                 className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white "
                 onClick={() => {
-                  if (window.confirm('Please confirm purpose')) {
+                  if (current_user_id === null) {
+                    alert('Please login to purchase this item');
+                    router.push('/login');
+                    return;
+                  }
+                  else if (window.confirm('Please confirm purchase of this item')) {
                     const params = new URLSearchParams({
                       item_id: item.item_id,
                       item_name: item.item_name,

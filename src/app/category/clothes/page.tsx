@@ -2,6 +2,7 @@
 import React, { use, useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/UserContext";
 interface Item {
   item_id: string; 
   item_name: string;
@@ -15,6 +16,7 @@ interface Item {
   user_email: string;
 }
 export default function ClothesPage() {
+  const { current_user_id, current_user_name, current_user_email } = useUser();
   const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
 
@@ -78,7 +80,12 @@ export default function ClothesPage() {
                     <button
                 className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white "
                 onClick={() => {
-                  if (window.confirm('Please confirm purpose')) {
+                  if (current_user_id === null) {
+                    alert('Please login to purchase this item');
+                    router.push('/login');
+                    return;
+                  }
+                  else if (window.confirm('Please confirm purchase of this item')) {
                     const params = new URLSearchParams({
                       item_id: item.item_id,
                       item_name: item.item_name,
