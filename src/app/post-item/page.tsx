@@ -128,8 +128,9 @@ export default function PostItemPage() {
               {/* <option value="" disabled selected>Select a category</option> */}
               <option value="dorm-stuff">Dorm Stuff</option>
               <option value="supplies">Supplies</option>
-              <option value="class-notes">Class Notes</option>
+              <option value="class-materials">Class Materials</option>
               <option value="clothes">Clothes</option>
+              <option value="electronics">Electronics</option>
             </select>
           </label>
           <label className="flex flex-col gap-1">

@@ -6,7 +6,7 @@ import QueryProvider from "./QueryProvider";
 import { supabase } from "@/utils/supabase/client";
 import { UserProvider } from "./UserContext";
 
-export default function RootLayout({ children }: { children: React.ReactNode, searchParams: { name: string } }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
   return (
     <UserProvider>
     <html lang="en">
+    <title>UNC Marketplace</title>
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
       </head>
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode, se
                 <Link href="/category/supplies" className="hover:underline">Supplies</Link>
                 <Link href="/category/class-notes" className="hover:underline">Class Notes</Link>
                 <Link href="/category/clothes" className="hover:underline">Clothes</Link>
+                <Link href="/category/electronics" className="hover:underline">Electronics</Link>
                 {name ? (
                   <div className="flex items-center gap-2">
                     <Link href="/cart">

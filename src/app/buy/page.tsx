@@ -5,8 +5,10 @@ import { supabase } from "@/utils/supabase/client";
 import router from "next/router";
 import { useUser } from "../UserContext";
 
+
 export default function BuyPage() {
-const { current_user_id, current_user_name, current_user_email } = useUser();
+  const { current_user_id, current_user_name, current_user_email } = useUser();
+console.log(current_user_id, current_user_name, current_user_email);
 
   const searchParams = useSearchParams();
   const item_id = searchParams.get("item_id");

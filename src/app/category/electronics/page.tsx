@@ -14,7 +14,7 @@ interface Item {
   user_name: string;
   user_email: string;
 }
-export default function DormStuffPage() {
+export default function ElectronicsPage() {
   const router = useRouter();
 
   const [items, setItems] = useState<Item[]>([]);
@@ -24,7 +24,7 @@ export default function DormStuffPage() {
       const { data, error } = await supabase
         .from("Items")
         .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name, user_email")
-        .eq("item_category", "dorm-stuff"); // Filter by category
+        .eq("item_category", "electronics"); // Filter by category
 
       if (error) {
         console.error("Error fetching items:", error);
@@ -40,9 +40,9 @@ export default function DormStuffPage() {
   return (
     <section className="flex flex-col items-center justify-center gap-8 py-16">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
-        <h1 className="text-4xl font-bold text-blue-300 mb-4">Dorm Stuff</h1>
+        <h1 className="text-4xl font-bold text-blue-300 mb-4">Electronics</h1>
         <p className="text-lg text-gray-700 mb-6">
-          Beds, mini-fridges, decor, and more for your dorm room.
+          Phones, laptops, airpods, beats, and other electronics.
         </p>
       </div>
       <div className="flex flex-wrap justify-start w-full">
@@ -101,7 +101,7 @@ export default function DormStuffPage() {
             </div>
           ))
         ) : (
-          <p className="text-gray-500">No items found for Dorm Stuff.</p>
+          <p className="text-gray-500">No items found for Electronics.</p>
         )}
       </div>
     </section>

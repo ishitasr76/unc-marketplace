@@ -85,16 +85,16 @@ export default function UserInfoPage() {
   return (
     <section className="flex row items-center justify-center gap-5" >
      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full ">
       {/* <h1 className = "text-2xl font-semibold"> Your products on the market:</h1> */}
       <div className="bg-white rounded-lg shadow-md p-4 text-left flex flex-col items-center justify-center ">
-      <h1 className = "text-4xl font-bold text-blue-300"> Hello, {current_user_name} </h1> 
-      <h1 className = "text-2xl font-semibold"> Your stats:</h1>
-      <p>Items sold: {userStats[0]?.items_sold}</p>
-      <p>Items bought: {userStats[0]?.items_bought}</p>
-      <p>Total money spent on app: ${userStats[0]?.total_money_spent_on_app}</p>
-      <p>Total money made on app: ${userStats[0]?.total_money_made_on_app}</p>
-      <p>Member since: {userStats[0]?.member_since}</p>
+      <h1 className = "text-4xl font-bold text-blue-300 underline"> Hello, {current_user_name} </h1> 
+      <h1 className = "text-2xl font-semibold text-gray-600"> Your outstanding stats:</h1>
+      <p className="text-gray-600 text-lg">Items sold: <span className="text-blue-300">{userStats[0]?.items_sold}</span></p>
+      <p className="text-gray-600 text-lg">Items bought: <span className="text-blue-300">{userStats[0]?.items_bought}</span></p>
+      <p className="text-gray-600 text-lg">Total money spent on app: <span className="text-blue-300">${userStats[0]?.total_money_spent_on_app}</span></p>
+      <p className="text-gray-600 text-lg">Total money made on app: <span className="text-blue-300">${userStats[0]?.total_money_made_on_app}</span></p>
+      <p className="text-gray-600 text-lg">Member since: <span className="text-blue-300">{userStats[0]?.member_since}</span></p>
       </div>
         {items.length > 0 ? (
           items.map((item) => (
@@ -116,13 +116,31 @@ export default function UserInfoPage() {
                 />
               )}
                 <p className="text-gray-500 mt-1">{item.item_description}</p>
+                <div className="flex justify-around items-center">
                 <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
                 On the market
               </button>
+              <button className="mt-2 border-2 border-red-300 text-red-300 px-4 py-2 rounded hover:bg-red-300 hover:text-white "
+              onClick={async () => {
+                const { error } = await supabase
+                .from('Items')
+                .delete()
+                .eq('item_id', item.item_id);
+                if (error) {
+                  console.error("Error deleting item:", error);
+                } else {
+                  alert("Item deleted successfully");
+                window.location.reload();                }
+              }}>
+                Remove Item
+              </button>
+                </div>
             </div>
           ))
         ) : (
-          <p className="text-gray-500">No items found for current user.</p>
+          <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
+          <p className="text-blue-300 text-2xl">No items on the market!</p>
+          </div>
         )}
         {soldItems.length > 0 ? (
           soldItems.map((item) => (
@@ -144,13 +162,15 @@ export default function UserInfoPage() {
                 />
               )}
                 <p className="text-gray-500 mt-1">{item.item_description}</p>
-                <button className="mt-2 border-2 border-red-300 text-red-300 px-4 py-2 rounded hover:bg-red-300 hover:text-white ">
+                <button className="mt-2 border-2 bg-red-400 text-white px-4 py-2 rounded ">
                 Sold
               </button>
             </div>
           ))
         ) : (
-          <p className="text-gray-500">No items sold for current user.</p>
+          <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
+          <p className="text-blue-300 text-2xl">No items sold!</p>
+          </div>
         )}
       </div>
     </section>

@@ -1,8 +1,9 @@
 "use client";
 import React, { use, useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 interface Item {
-  item_id: number; 
+  item_id: string; 
   item_name: string;
   item_category: string;
   item_price: string;
@@ -11,15 +12,17 @@ interface Item {
   uploaded_date_time: string; //check if it should be string or date for (type)
   user_id: string;
   user_name: string;
+  user_email: string;
 }
 export default function ClothesPage() {
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
     const fetchItems = async () => {
       const { data, error } = await supabase
         .from("Items")
-        .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name")
+        .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name,user_email")
         .eq("item_category", "clothes"); // Filter by category
 
       if (error) {
@@ -72,7 +75,25 @@ export default function ClothesPage() {
               <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
                      Add to Cart
                     </button>
-              <button className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white ">
+                    <button
+                className="mt-2 border-2 border-blue-300 text-blue-300 px-4 py-2 rounded hover:bg-blue-300 hover:text-white "
+                onClick={() => {
+                  if (window.confirm('Please confirm purpose')) {
+                    const params = new URLSearchParams({
+                      item_id: item.item_id,
+                      item_name: item.item_name,
+                      item_price: item.item_price,
+                      item_picture: item.item_picture || '',
+                      item_category: item.item_category,
+                      item_description: item.item_description,
+                      seller_name: item.user_name,
+                      seller_id:item.user_id,
+                      seller_email: item.user_email || '',
+                    });
+                    router.push(`/buy?${params.toString()}`);
+                  }
+                }}
+              >
                 Buy Now
               </button>
               </div>
