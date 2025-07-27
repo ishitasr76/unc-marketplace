@@ -5,9 +5,9 @@ import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useUser } from "../../UserContext";
+import Link from "next/link";
 
 export default function SignupPage() {
-
   const [form, setForm] = useState({ email: "", password: "", name: "" });
   const [success, setSuccess] = useState("");
   const router = useRouter();
@@ -18,15 +18,14 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          data: { full_name: name }, // to access: user.user_metadata.full_name
+          data: { full_name: name },
         },
       });
       if (error) throw error;
       return data;
     },
-    //after succesful sign up, it redirects them to the login page so the user can log into the application.
     onSuccess: (data) => {
-      setSuccess("Signup successful!");
+      setSuccess("Signup successful! Redirecting to login...");
       const current_user = data.user || null;
       async function addToUserTable() {   
         await supabase.from('UserStats').insert([{
@@ -41,10 +40,10 @@ export default function SignupPage() {
         }]);
       }
       addToUserTable();
-      console.log ("user added to user table");
+      console.log("user added to user table");
       setTimeout(() => {
         router.push("/login");
-      }, 2000); // Redirect after 2 seconds
+      }, 2000);
     },
     onError: (error: any) => {
       setSuccess("");
@@ -62,64 +61,118 @@ export default function SignupPage() {
   };
 
   return (
-      <section className="flex flex-col items-center justify-center py-16">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center" style={{ color: "#7BAFD4" }}>Sign Up</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1">
-            Name
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="border rounded px-3 py-2"
-              required
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Email</span>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="border rounded px-3 py-2"
-              placeholder="Enter your email"
-              autoComplete="email"
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Password</span>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="border rounded px-3 py-2"
-              placeholder="Enter your password"
-              autoComplete="new-password"
-            />
-          </label>
-          <button
-            type="submit"
-            className="bg-[#7BAFD4] text-white rounded px-4 py-2 font-semibold hover:bg-blue-400 transition"
-            disabled={signupMutation.isPending}
-          >
-            {signupMutation.isPending ? "Signing up..." : "Sign Up"}
-          </button>
-          {signupMutation.isError && (
-            <div className="text-red-600 text-sm text-center mt-2">
-              {(signupMutation.error as any)?.message || "Signup failed. Please try again."}
+    <div className="min-h-[80vh] flex items-center justify-center py-12">
+      <div className="w-full max-w-md space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-unc-blue rounded-xl flex items-center justify-center mx-auto">
+            <span className="material-symbols-outlined text-white text-2xl">person_add</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">Create account</h1>
+            <p className="text-muted-foreground">Join UNC Marketplace to buy and sell with fellow students</p>
+          </div>
+        </div>
+
+        {/* Signup Form */}
+        <div className="card bg-background rounded-xl border border-border p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium text-foreground">
+                  Full name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-foreground">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                />
+              </div>
             </div>
-          )}
-          {success && (
-            <div className="text-green-600 text-sm text-center mt-2">{success}</div>
-          )}
-        </form>
+
+            {signupMutation.isError && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-sm text-destructive text-center">
+                  {(signupMutation.error as any)?.message || "Signup failed. Please try again."}
+                </p>
+              </div>
+            )}
+
+            {success && (
+              <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <p className="text-sm text-green-600 text-center">{success}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="btn w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              disabled={signupMutation.isPending}
+            >
+              {signupMutation.isPending ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                  <span>Creating account...</span>
+                </div>
+              ) : (
+                "Create account"
+              )}
+            </button>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link 
+                  href="/login" 
+                  className="text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

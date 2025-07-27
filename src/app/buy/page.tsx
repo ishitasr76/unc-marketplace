@@ -4,10 +4,18 @@ import React, { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
 import { useUser } from "../UserContext";
+import Link from "next/link";
 
 export default function BuyPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    }>
       <BuyPageContent />
     </Suspense>
   );
@@ -15,7 +23,6 @@ export default function BuyPage() {
 
 function BuyPageContent() {
   const { current_user_id, current_user_name, current_user_email } = useUser();
-  console.log(current_user_id, current_user_name, current_user_email);
 
   const searchParams = useSearchParams();
   const item_id = searchParams.get("item_id");
@@ -40,7 +47,7 @@ function BuyPageContent() {
       !current_user_name ||
       !current_user_email
     ) {
-      return; // Wait until all are available
+      return;
     }
     if (hasRun.current) return;
     hasRun.current = true;
@@ -66,7 +73,7 @@ function BuyPageContent() {
         alert('Failed to record sale!');
         console.error(error);
       } else {
-        alert('Sale recorded!');
+        console.log('Sale recorded!');
       }
     }
 
@@ -75,6 +82,9 @@ function BuyPageContent() {
         .from('Items')
         .delete()
         .eq('item_id', item_id);
+      if (error) {
+        console.error('Error removing item:', error);
+      }
     }
 
     async function updateSellerStats() {
@@ -82,7 +92,6 @@ function BuyPageContent() {
         .from('UserStats')
         .select('items_sold, total_money_made_on_app')
         .eq('user_id', sellerId);
-      console.log(data);
       const items_sold = (data?.[0]?.items_sold || 0) + 1;
       const total_money_made_on_app = (data?.[0]?.total_money_made_on_app || 0) + Number(itemPrice);
 
@@ -106,7 +115,6 @@ function BuyPageContent() {
         .from('UserStats')
         .select('items_bought, total_money_spent_on_app')
         .eq('user_id', current_user_id);
-      console.log(data);
       const items_bought = (data?.[0]?.items_bought || 0) + 1;
       const total_money_spent_on_app = (data?.[0]?.total_money_spent_on_app || 0) + Number(itemPrice);
 
@@ -141,28 +149,94 @@ function BuyPageContent() {
     !current_user_name ||
     !current_user_email
   ) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground">Loading purchase details...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <section className="flex flex-col items-center justify-center gap-8 py-16">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center">
-        <h1 className="text-2xl font-bold text-blue-300 mb-4"> Congratulations! You have successfully bought an item from the marketplace.</h1>
-        <p className="text-lg text-gray-700 mb-6"> We have sent an email to the seller with your purchase information. Make sure to contact them to arrange payment and pickup or delivery.</p>
-        <p className="text-lg text-gray-700 mb-6">Here is the information for the seller and your purchase:</p>
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-xl w-full text-center flex items-center justify-center border-2 border-blue-300">
-          <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${itemPicture || ''}`} alt={itemName || ''} className="w-1/2 h-1/2" />
-          <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center gap-5 ">
-              <p className="text-lg text-gray-700 underline ">{itemName}</p>
-              <p className="text-lg text-gray-700 "> ${itemPrice}</p>
+    <div className="min-h-[80vh] flex items-center justify-center py-12">
+      <div className="w-full max-w-2xl space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <div className="space-y-4">
+            <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center mx-auto">
+              <span className="material-symbols-outlined text-white text-2xl">check_circle</span>
             </div>
-            <p className="text-md text-gray-700 ">{itemDescription}</p>
-            <p className="text-md text-gray-700"> <span className="font-bold text-blue-300">Seller Email:</span> {sellerEmail}</p>
-            <p className="text-md text-gray-700"> <span className="font-bold text-blue-300">Seller Name:</span> {sellerName}</p>
+            <h1 className="text-3xl font-bold text-foreground">Purchase Successful!</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Congratulations! Your purchase has been completed successfully.
+            </p>
+          </div>
+        </div>
+
+        {/* Purchase Details */}
+        <div className="card bg-background rounded-xl border border-border p-8">
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-bold text-foreground">Purchase Details</h2>
+              <p className="text-muted-foreground">
+                We have sent an email to the seller with your purchase information. 
+                Make sure to contact them to arrange payment and pickup or delivery.
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
+              {itemPicture && (
+                <div className="w-full md:w-1/2">
+                  <div className="aspect-square rounded-lg overflow-hidden">
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${itemPicture}`}
+                      alt={itemName}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex-1 space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-foreground">{itemName}</h3>
+                  <p className="text-3xl font-bold text-primary">${itemPrice}</p>
+                  <p className="text-muted-foreground">{itemDescription}</p>
+                </div>
+                
+                <div className="space-y-3 pt-4 border-t border-border">
+                  <h4 className="font-semibold text-foreground">Seller Information</h4>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">Name:</span> {sellerName}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">Email:</span> {sellerEmail}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border">
+              <Link 
+                href="/"
+                className="btn flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 text-center"
+              >
+                Continue Shopping
+              </Link>
+              <Link 
+                href="/orders"
+                className="btn flex-1 bg-secondary text-secondary-foreground px-6 py-3 rounded-lg font-semibold border border-border hover:bg-secondary/80 text-center"
+              >
+                View Orders
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 } 

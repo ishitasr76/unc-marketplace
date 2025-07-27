@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
-import { unique } from "next/dist/build/utils";
 
 export default function PostItemPage() {
   const [form, setForm] = useState({
@@ -15,8 +14,9 @@ export default function PostItemPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [showWarning, setShowWarning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-// if the user is not signed in, it redirects them to log in before being able to post an item.
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -32,13 +32,31 @@ export default function PostItemPage() {
   }, [router]);
 
   if (checkingAuth) {
-    return <div className="text-center mt-10">Checking authentication...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
+  
   if (showWarning) {
-    return <div className="text-center mt-10 text-red-600 font-semibold">You must be signed in to post an item. Redirecting to login...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+            <span className="material-symbols-outlined text-destructive text-2xl">warning</span>
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">Authentication required</h3>
+          <p className="text-destructive">You must be signed in to post an item. Redirecting to login...</p>
+        </div>
+      </div>
+    );
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     setForm((prev) => ({
       ...prev,
@@ -53,13 +71,14 @@ export default function PostItemPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
   
     try {
       // Upload the picture to Supabase Storage
       let pictureUrl = null;
       if (form.picture) {
         const { data, error } = await supabase.storage
-          .from("item-images") // Replace with your storage bucket name
+          .from("item-images")
           .upload(`pictures/${Date.now()}_${form.picture.name}`, form.picture);
   
         if (error) {
@@ -82,9 +101,9 @@ export default function PostItemPage() {
           user_name: user?.user_metadata.full_name || "n/a",
           user_email: user?.user_metadata.email || "n/a",
           item_name: form.name,
-          item_category: (document.getElementById("categories") as HTMLSelectElement).value, // Get selected category
+          item_category: (document.getElementById("categories") as HTMLSelectElement).value,
           item_price: parseFloat(form.price),
-          item_picture: pictureUrl, // Save the picture URL
+          item_picture: pictureUrl,
           item_description: form.description,
           uploaded_date_time: new Date().toISOString().split("T").join(" ").slice(0, -5)
         },
@@ -104,89 +123,142 @@ export default function PostItemPage() {
     } catch (error) {
       console.error("Error posting item:", error);
       alert("Failed to post item. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <section className="flex flex-col items-center justify-center py-16">
-      <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-2xl font-bold text-blue-800 mb-6 text-center">Post an Item</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Name of Item</span>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="border rounded px-3 py-2"
-              placeholder="e.g. Mini Fridge"
-            />
-            <span className="font-medium">Category</span>
-            <select name="categories" id="categories" className="border rounded px-3 py-2"  required>
-              {/* <option value="" disabled selected>Select a category</option> */}
-              <option value="dorm-stuff">Dorm Stuff</option>
-              <option value="supplies">Supplies</option>
-              <option value="class-materials">Class Materials</option>
-              <option value="clothes">Clothes</option>
-              <option value="electronics">Electronics</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Price ($)</span>
-            <input
-              type="number"
-              name="price"
-              value={form.price}
-              onChange={handleChange}
-              required
-              min="0"
-              step="0.01"
-              className="border rounded px-3 py-2"
-              placeholder="e.g. 50"
-            />
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Picture</span>
-            <input
-              type="file"
-              name="picture"
-              accept="image/*"
-              onChange={handleChange}
-              ref={fileInputRef}
-              className="hidden"
-            />
+    <div className="min-h-[80vh] flex items-center justify-center py-12">
+      <div className="w-full max-w-2xl space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-unc-blue rounded-xl flex items-center justify-center mx-auto">
+            <span className="material-symbols-outlined text-white text-2xl">add_shopping_cart</span>
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground">Post an Item</h1>
+            <p className="text-muted-foreground">Sell your items to fellow UNC students</p>
+          </div>
+        </div>
+
+        {/* Post Item Form */}
+        <div className="card bg-background rounded-xl border border-border p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium text-foreground">
+                  Item name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  placeholder="e.g. Mini Fridge"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="categories" className="text-sm font-medium text-foreground">
+                  Category
+                </label>
+                <select 
+                  id="categories"
+                  name="categories" 
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  required
+                >
+                  <option value="dorm-stuff">Dorm Stuff</option>
+                  <option value="supplies">Supplies</option>
+                  <option value="class-materials">Class Materials</option>
+                  <option value="clothes">Clothes</option>
+                  <option value="electronics">Electronics</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="price" className="text-sm font-medium text-foreground">
+                Price ($)
+              </label>
+              <input
+                id="price"
+                type="number"
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                required
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                placeholder="e.g. 50.00"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Item picture
+              </label>
+              <input
+                type="file"
+                name="picture"
+                accept="image/*"
+                onChange={handleChange}
+                ref={fileInputRef}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={handleFileButtonClick}
+                className="btn w-full bg-secondary text-secondary-foreground px-4 py-3 rounded-lg border border-border hover:bg-secondary/80 transition-colors"
+              >
+                <span className="material-symbols-outlined mr-2">upload</span>
+                {form.picture ? "Change File" : "Choose File"}
+              </button>
+              {form.picture && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Selected: {(form.picture as File).name}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="description" className="text-sm font-medium text-foreground">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-none"
+                placeholder="Describe your item..."
+              />
+            </div>
+
             <button
-              onClick={handleFileButtonClick}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+              type="submit"
+              className="btn w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              disabled={isSubmitting}
             >
-              {form.picture ? "Change File" : "Choose File"}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
+                  <span>Posting item...</span>
+                </div>
+              ) : (
+                "Post Item"
+              )}
             </button>
-            {form.picture && (
-              <span className="text-sm text-gray-600 mt-1">{(form.picture as File).name}</span>
-            )}
-          </label>
-          <label className="flex flex-col gap-1">
-            <span className="font-medium">Description</span>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              required
-              className="border rounded px-3 py-2"
-              placeholder="Describe your item..."
-              rows={4}
-            />
-          </label>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition"
-          >
-            Submit
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 } 

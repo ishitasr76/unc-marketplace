@@ -46,42 +46,72 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <title>UNC Marketplace</title>
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-screen flex flex-col bg-blue-50">
+      <body className="min-h-screen flex flex-col bg-background">
         <QueryProvider>
-          <header className="bg-blue-300 text-white shadow">
+          <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <nav className="container mx-auto flex items-center justify-between py-4 px-6">
-              <Link href="/" className="text-2xl font-bold tracking-tight">UNC Marketplace</Link>
-              <div className="flex gap-4">
-                <Link href="/category/dorm-stuff" className="hover:underline">Dorm Stuff</Link>
-                <Link href="/category/supplies" className="hover:underline">Supplies</Link>
-                <Link href="/category/class-notes" className="hover:underline">Class Notes</Link>
-                <Link href="/category/clothes" className="hover:underline">Clothes</Link>
-                <Link href="/category/electronics" className="hover:underline">Electronics</Link>
+              <Link href="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-unc-blue rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">UNC</span>
+                </div>
+                <span className="text-xl font-bold tracking-tight text-foreground">Marketplace</span>
+              </Link>
+              
+              <div className="hidden md:flex items-center space-x-6">
+                <Link href="/category/dorm-stuff" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Dorm Stuff</Link>
+                <Link href="/category/supplies" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Supplies</Link>
+                <Link href="/category/class-materials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Class Materials</Link>
+                <Link href="/category/clothes" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Clothes</Link>
+                <Link href="/category/electronics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Electronics</Link>
+              </div>
+              
+              <div className="flex items-center space-x-4">
                 {name ? (
-                  <div className="flex items-center gap-2">
-                    <Link href="/cart">
-                      <span className="material-symbols-outlined">
-                        shopping_cart
-                      </span>
+                  <>
+                    <Link href="/cart" className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
+                      <span className="material-symbols-outlined text-xl">shopping_cart</span>
                     </Link>
-                    <Link href = "/user-info" className="hover:underline font-bold">{name}</Link>
+                    <Link href="/user-info" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                      {name}
+                    </Link>
                     <button
                       onClick={handleSignOut}
-                      className="hover:underline text-sm bg-blue-500 text-white px-2 py-1 rounded"
+                      className="text-sm bg-destructive text-destructive-foreground px-3 py-1.5 rounded-md hover:bg-destructive/90 transition-colors"
                     >
                       Sign Out
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <Link href="/login" className="hover:underline">Login</Link>
+                  <Link href="/login" className="text-sm font-medium text-primary hover:text-primary/80 transition-colors">Login</Link>
                 )}
               </div>
             </nav>
           </header>
-          <main className="flex-1 container mx-auto px-4 py-8">{children}</main>
-          <footer className="bg-blue-800 text-white text-center py-4 mt-8">
-            &copy; {new Date().getFullYear()} UNC Marketplace. All rights reserved.
+          
+          <main className="flex-1 container mx-auto px-4 py-8 animate-fade-in">{children}</main>
+          
+          <footer className="border-t bg-muted/50">
+            <div className="container mx-auto px-6 py-8">
+              <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 bg-unc-blue rounded-md flex items-center justify-center">
+                    <span className="text-white font-bold text-xs">UNC</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    &copy; {new Date().getFullYear()} UNC Marketplace. All rights reserved.
+                  </span>
+                </div>
+                <div className="flex space-x-6 text-sm text-muted-foreground">
+                  <Link href="/category/dorm-stuff" className="hover:text-foreground transition-colors">Dorm Stuff</Link>
+                  <Link href="/category/supplies" className="hover:text-foreground transition-colors">Supplies</Link>
+                  <Link href="/category/class-materials" className="hover:text-foreground transition-colors">Class Materials</Link>
+                  <Link href="/category/clothes" className="hover:text-foreground transition-colors">Clothes</Link>
+                  <Link href="/category/electronics" className="hover:text-foreground transition-colors">Electronics</Link>
+                </div>
+              </div>
+            </div>
           </footer>
         </QueryProvider>
       </body>
