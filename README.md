@@ -39,3 +39,64 @@ Test User format:
 name: user#
 email: user#@gmail.com
 password:testuser#
+
+## Email Notifications Setup
+
+This application includes automatic email notifications to sellers when their items are purchased using EmailJS for free email sending.
+
+### 1. Set up EmailJS (Free Email Service)
+
+1. Sign up for a free account at [EmailJS](https://www.emailjs.com/)
+2. Create an email service (Gmail, Outlook, etc.)
+3. Create an email template
+4. Get your credentials:
+   - **Public Key**: Found in Account > API Keys
+   - **Service ID**: Found in Email Services
+   - **Template ID**: Found in Email Templates
+
+### 2. Update Your Code
+
+Replace the placeholder values in both `src/app/buy/page.tsx` and `src/app/cart/page.tsx`:
+
+```javascript
+// Replace these values:
+emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
+await emailjs.send(
+  'YOUR_SERVICE_ID',
+  'YOUR_TEMPLATE_ID',
+  templateParams
+);
+```
+
+### 3. EmailJS Free Tier Benefits
+
+- **200 emails per month** (completely free)
+- **No backend setup required** - works directly from frontend
+- **No domain verification needed**
+- **Professional email templates**
+- **Easy to implement**
+
+### 4. Email Features
+
+- **Automatic seller notifications** when items are purchased
+- **Professional email templates** with TriDealz branding
+- **Complete transaction details** including buyer information
+- **Safety guidelines** for completing transactions
+
+The email system will automatically send notifications for:
+- Direct purchases from item pages
+- Cart purchases
+- All transaction types
+
+### 5. Email Template Variables
+
+Your EmailJS template should include these variables:
+- `{{to_email}}` - Seller's email
+- `{{to_name}}` - Seller's name
+- `{{from_name}}` - Buyer's name
+- `{{from_email}}` - Buyer's email
+- `{{item_name}}` - Item name
+- `{{item_price}}` - Item price
+- `{{item_description}}` - Item description
+- `{{school_name}}` - School name
+- `{{message}}` - Pre-formatted message

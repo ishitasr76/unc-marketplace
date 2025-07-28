@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { supabase } from "@/utils/supabase/client";
 import { useUser } from "../UserContext";
 import Link from "next/link";
+import emailjs from '@emailjs/browser';
 
 export default function BuyPage() {
   return (
@@ -34,6 +35,7 @@ function BuyPageContent() {
   const sellerId = searchParams.get("seller_id");
   const sellerName = searchParams.get("seller_name");
   const sellerEmail = searchParams.get("seller_email");
+  const schoolName = searchParams.get("school_name");
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -67,6 +69,7 @@ function BuyPageContent() {
             bought_by_user_id: current_user_id,
             bought_by_user_name: current_user_name,
             sold_by_user_email: sellerEmail,
+            school_name: schoolName,
           }
         ]);
       if (error) {
@@ -74,6 +77,36 @@ function BuyPageContent() {
         console.error(error);
       } else {
         console.log('Sale recorded!');
+      }
+    }
+
+    async function sendEmailToSeller() {
+      try {
+        // Initialize EmailJS with your public key
+        emailjs.init("0cuSr3u8lY_VNz5ln"); // Replace with your actual public key
+
+        const templateParams = {
+          to_email: sellerEmail,
+          to_name: sellerName,
+          from_name: current_user_name,
+          from_email: current_user_email,
+          item_name: itemName,
+          item_price: itemPrice,
+          item_description: itemDescription || '',
+          school_name: schoolName || 'Not specified',
+          // message: `Your item "${itemName}" has been sold to ${current_user_name} for $${itemPrice}. Please contact them at ${current_user_email} to arrange pickup.`
+        };
+        console.log('about to send email');
+        await emailjs.send(
+          
+          'service_xow6qoh', // Replace with your EmailJS service ID
+          'template_n8dtcod', // Replace with your EmailJS template ID
+          templateParams
+        );
+
+        console.log('Email sent to seller successfully');
+      } catch (error) {
+        console.error('Error sending email:', error);
       }
     }
 
@@ -137,6 +170,7 @@ function BuyPageContent() {
     removeItemFromMarketplace();
     updateSellerStats();
     updateBuyerStats();
+    sendEmailToSeller();
   }, [item_id, itemName, itemPrice, sellerEmail, sellerName, current_user_id, current_user_name, current_user_email]);
 
   if (
@@ -214,6 +248,9 @@ function BuyPageContent() {
                     </p>
                     <p className="text-sm text-muted-foreground">
                       <span className="font-medium text-foreground">Email:</span> {sellerEmail}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-foreground">School:</span> {schoolName}
                     </p>
                   </div>
                 </div>

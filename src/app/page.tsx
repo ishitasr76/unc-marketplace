@@ -17,7 +17,7 @@ export default function Home() {
     async function fetchItems() {
       const { data, error } = await supabase
         .from("Items")
-        .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name, user_email");
+        .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name, user_email, school_name");
       if (!error) setItems(data || []);
       setLoading(false);
     }
@@ -193,6 +193,9 @@ export default function Home() {
                     </div>
                     
                     <div className="space-y-3">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {item.school_name}
+                        </span>
                       <p className="text-sm text-muted-foreground">
                         Sold by{" "}
                         <span className="font-medium text-foreground">{item.user_name}</span>
@@ -216,6 +219,7 @@ export default function Home() {
                                   seller_email: item.user_email,
                                   buyer_id: current_user_id,
                                   all_items_db_id: item.item_id,
+                                  school_name: item.school_name
                                 }
                               ])
                             if (error) {
@@ -248,6 +252,7 @@ export default function Home() {
                                 seller_name: item.user_name,
                                 seller_id: item.user_id,
                                 seller_email: item.user_email || '',
+                                school_name: item.school_name
                               });
                               router.push(`/buy?${params.toString()}`);
                             }

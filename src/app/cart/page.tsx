@@ -4,6 +4,7 @@ import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/UserContext";
 import Link from "next/link";
+import emailjs from '@emailjs/browser';
 
 interface Item {
   id: string; 
@@ -16,6 +17,7 @@ interface Item {
   seller_id: string;
   seller_email: string;
   all_items_db_id: string;
+  school_name: string;
 }
 
 export default function CartPage() {
@@ -30,7 +32,7 @@ export default function CartPage() {
     const fetchItems = async () => {
       const { data, error } = await supabase
         .from("InCartItems")
-        .select("id, item_name, item_category, item_price, item_picture, item_description, seller_name, seller_id, seller_email, all_items_db_id")
+        .select("id, item_name, item_category, item_price, item_picture, item_description, seller_name, seller_id, seller_email, all_items_db_id, school_name")
         .eq("buyer_id", current_user_id);
 
       if (error) {
@@ -103,6 +105,9 @@ export default function CartPage() {
                         <p className="text-sm text-muted-foreground">
                           {item.item_description}
                         </p>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {item.school_name}
+                        </span>
                         <p className="text-sm text-muted-foreground">
                           Sold by{" "}
                           <span className="font-medium text-foreground">{item.seller_name}</span>
@@ -168,6 +173,7 @@ export default function CartPage() {
                           sold_by_user_name: item.seller_name,
                           bought_by_user_name: current_user_name,
                           sold_by_user_email: item.seller_email,
+                          school_name: item.school_name
                         })
                       if (insertError) {
                         console.error("Error inserting item:", insertError);
@@ -223,6 +229,34 @@ export default function CartPage() {
                       
                       updateSellerStats();
                       updateBuyerStats();
+                      
+                                             // Send email to seller using EmailJS
+                       try {
+                         // Initialize EmailJS with your public key
+                         emailjs.init("0cuSr3u8lY_VNz5ln"); // Replace with your actual public key
+
+                         const templateParams = {
+                           to_email: item.seller_email,
+                           to_name: item.seller_name,
+                           from_name: current_user_name,
+                           from_email: current_user_email,
+                           item_name: item.item_name,
+                           item_price: item.item_price,
+                           item_description: item.item_description || '',
+                           school_name: item.school_name || 'Not specified',
+                          //  message: `Your item "${item.item_name}" has been sold to ${current_user_name} for $${item.item_price}. Please contact them at ${current_user_email} to arrange pickup.`
+                         };
+
+                         await emailjs.send(
+                           'service_xow6qoh', // Replace with your EmailJS service ID
+                           'template_n8dtcod', // Replace with your EmailJS template ID
+                           templateParams
+                         );
+
+                         console.log('Email sent to seller successfully');
+                       } catch (error) {
+                         console.error('Error sending email:', error);
+                       }
                       
                       const { error: deleteItemError } = await supabase
                         .from("Items")

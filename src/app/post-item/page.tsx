@@ -105,7 +105,8 @@ export default function PostItemPage() {
           item_price: parseFloat(form.price),
           item_picture: pictureUrl,
           item_description: form.description,
-          uploaded_date_time: new Date().toISOString().split("T").join(" ").slice(0, -5)
+          uploaded_date_time: new Date().toISOString().split("T").join(" ").slice(0, -5),
+          school_name: (document.getElementById("school_name") as HTMLSelectElement).value || "n/a"
         },
       ]);
   
@@ -172,6 +173,7 @@ export default function PostItemPage() {
                   className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                   required
                 >
+                  <option value="">Select a category</option>
                   <option value="dorm-stuff">Dorm Stuff</option>
                   <option value="supplies">Supplies</option>
                   <option value="class-materials">Class Materials</option>
@@ -180,7 +182,23 @@ export default function PostItemPage() {
                 </select>
               </div>
             </div>
-            
+            <div className="space-y-2">
+                <label htmlFor="school_name" className="text-sm font-medium text-foreground">
+                  School Sold From
+                </label>
+                <select 
+                  id="school_name"
+                  name="school_name" 
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  required
+                >
+                  <option value="">Select a school</option>
+                  <option value="UNC Chapel Hill">UNC Chapel Hill</option>
+                  <option value="NC State">NC State</option>
+                  <option value="Duke">Duke</option>
+                 
+                </select>
+              </div>
             <div className="space-y-2">
               <label htmlFor="price" className="text-sm font-medium text-foreground">
                 Price ($)
