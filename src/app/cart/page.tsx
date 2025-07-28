@@ -232,8 +232,8 @@ export default function CartPage() {
                       
                                              // Send email to seller using EmailJS
                        try {
-                         // Initialize EmailJS with your public key
-                         emailjs.init("0cuSr3u8lY_VNz5ln"); // Replace with your actual public key
+                                                   // Initialize EmailJS with your public key
+                          emailjs.init("0cuSr3u8lY_VNz5ln", "https://api.emailjs.com"); // Add the API URL
 
                          const templateParams = {
                            to_email: item.seller_email,

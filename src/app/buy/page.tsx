@@ -83,7 +83,7 @@ function BuyPageContent() {
     async function sendEmailToSeller() {
       try {
         // Initialize EmailJS with your public key
-        emailjs.init("0cuSr3u8lY_VNz5ln"); // Replace with your actual public key
+        emailjs.init("0cuSr3u8lY_VNz5ln", "https://api.emailjs.com"); // Add the API URL
 
         const templateParams = {
           to_email: sellerEmail,
