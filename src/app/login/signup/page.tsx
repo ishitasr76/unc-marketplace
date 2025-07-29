@@ -70,7 +70,7 @@ export default function SignupPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">Create account</h1>
-            <p className="text-muted-foreground">Join UNC Marketplace to buy and sell with fellow students</p>
+            <p className="text-muted-foreground">Join TriDealz to buy and sell with fellow students</p>
           </div>
         </div>
 

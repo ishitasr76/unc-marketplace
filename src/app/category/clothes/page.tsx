@@ -52,7 +52,7 @@ export default function ClothesPage() {
           </div>
           <h1 className="text-4xl font-bold text-foreground">Clothes</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            UNC gear, seasonal wear, and more clothing items.
+            College gear, seasonal wear, and more clothing items.
           </p>
         </div>
       </div>

@@ -139,7 +139,7 @@ export default function PostItemPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-foreground">Post an Item</h1>
-            <p className="text-muted-foreground">Sell your items to fellow UNC students</p>
+            <p className="text-muted-foreground">Sell your items to fellow college students</p>
           </div>
         </div>
 

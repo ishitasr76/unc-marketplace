@@ -53,7 +53,7 @@ export default function ClassMaterialsPage() {
           </div>
           <h1 className="text-4xl font-bold text-foreground">Class Materials</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Buy or sell class notes and textbooks for your UNC classes.
+            Buy or sell class notes and textbooks for your college classes.
           </p>
         </div>
       </div>

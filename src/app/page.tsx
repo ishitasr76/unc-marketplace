@@ -67,10 +67,10 @@ export default function Home() {
         <div className="space-y-6">
           <h1 className="text-4xl md:text-6xl font-bold text-foreground">
             Welcome to{" "}
-            <span className="text-unc-blue">UNC Marketplace</span>
+            <span className="text-unc-blue">TriDealz</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            The easiest way for UNC students to buy and sell dorm essentials, supplies, textbooks, clothes, and more.
+            The easiest way for RTP students to buy and sell dorm essentials, supplies, textbooks, clothes, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -136,7 +136,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-foreground mb-2">Class Materials</h3>
-                  <p className="text-muted-foreground text-sm">Buy or sell class notes and textbooks for your UNC classes.</p>
+                  <p className="text-muted-foreground text-sm">Buy or sell class notes and textbooks for your college classes.</p>
                 </div>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-foreground mb-2">Clothes</h3>
-                  <p className="text-muted-foreground text-sm">UNC gear, seasonal wear, and more clothing items.</p>
+                  <p className="text-muted-foreground text-sm">College gear, seasonal wear, and more clothing items.</p>
                 </div>
               </div>
             </div>
