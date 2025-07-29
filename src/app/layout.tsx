@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <UserProvider>
     <html lang="en">
-    <title>UNC Marketplace</title>
+    <title>TriDealz - RTP Student Marketplace</title>
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -54,9 +54,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <nav className="container mx-auto flex items-center justify-between py-4 px-6">
               <Link href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-unc-blue rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">UNC</span>
+                  <span className="text-white font-bold text-sm">TD</span>
                 </div>
-                <span className="text-xl font-bold tracking-tight text-foreground">Marketplace</span>
+                <span className="text-xl font-bold tracking-tight text-foreground">TriDealz</span>
               </Link>
               
               <div className="hidden md:flex items-center space-x-6">
@@ -96,12 +96,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="container mx-auto px-6 py-8">
               <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-unc-blue rounded-md flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">UNC</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    &copy; {new Date().getFullYear()} UNC Marketplace. All rights reserved.
-                  </span>
+                                  <div className="w-6 h-6 bg-unc-blue rounded-md flex items-center justify-center">
+                  <span className="text-white font-bold text-xs">TD</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  &copy; {new Date().getFullYear()} TriDealz - RTP Student Marketplace. All rights reserved.
+                </span>
                 </div>
                 <div className="flex space-x-6 text-sm text-muted-foreground">
                   <Link href="/category/dorm-stuff" className="hover:text-foreground transition-colors">Dorm Stuff</Link>
@@ -114,6 +114,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </footer>
         </QueryProvider>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
       </body>
     </html>
     </UserProvider>

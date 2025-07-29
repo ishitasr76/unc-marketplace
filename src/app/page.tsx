@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useUser } from "./UserContext";
+import emailjs from '@emailjs/browser';
 
 export default function Home() {
   const listingsRef = useRef<HTMLDivElement>(null);
@@ -12,6 +13,45 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { current_user_id, current_user_name, current_user_email } = useUser();
+
+  // Initialize EmailJS once when component mounts
+  useEffect(() => {
+    const initEmailJS = () => {
+      try {
+        console.log('Checking if EmailJS is available...');
+        console.log('EmailJS object:', emailjs);
+        console.log('EmailJS type:', typeof emailjs);
+        
+        // Check if EmailJS script is loaded
+        const emailjsScript = document.querySelector('script[src*="emailjs"]');
+        console.log('EmailJS script found:', emailjsScript);
+        
+        if (typeof emailjs !== 'undefined' && emailjs) {
+          console.log('EmailJS is available, initializing...');
+          try {
+            emailjs.init("n6jpUtOzTsP-7PWmk");
+            console.log('EmailJS initialized successfully');
+          } catch (initError) {
+            console.error('EmailJS init failed:', initError);
+            // Try alternative initialization
+            try {
+              emailjs.init("n6jpUtOzTsP-7PWmk", "https://api.emailjs.com");
+              console.log('EmailJS initialized with API URL');
+            } catch (altInitError) {
+              console.error('Alternative EmailJS init also failed:', altInitError);
+            }
+          }
+        } else {
+          console.log('EmailJS not available yet, retrying in 1 second...');
+          setTimeout(initEmailJS, 1000);
+        }
+      } catch (error) {
+        console.error('Error initializing EmailJS:', error);
+      }
+    };
+    
+    initEmailJS();
+  }, []);
 
   useEffect(() => {
     async function fetchItems() {
@@ -235,13 +275,113 @@ export default function Home() {
                         
                         <button
                           className="btn flex-1 bg-secondary text-secondary-foreground px-4 py-2 rounded-lg text-sm font-medium border border-border hover:bg-secondary/80"
-                          onClick={() => {
+                          onClick={async () => {
                             if (current_user_id === null) {
                               alert('Please login to purchase this item');
                               router.push('/login');
                               return;
                             }
                             else if (window.confirm('Please confirm purchase of this item')) {
+                              // Send email to seller
+                              try {
+                                // Add a small delay to ensure EmailJS is fully initialized
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                
+                                const templateParams = {
+                                  to_email: item.user_email,
+                                  to_name: item.user_name,
+                                  from_name: current_user_name,
+                                  from_email: current_user_email,
+                                  item_name: item.item_name,
+                                  item_price: item.item_price,
+                                  item_description: item.item_description || '',
+                                  school_name: item.school_name || 'Not specified',
+                                };
+                                
+                                console.log('Sending email to seller...');
+                                console.log('Template params:', templateParams);
+                                
+                                // Check if EmailJS is properly initialized
+                                if (typeof emailjs === 'undefined') {
+                                  throw new Error('EmailJS not available');
+                                }
+                                
+                                console.log('EmailJS object:', emailjs);
+                                console.log('About to call emailjs.send...');
+                                
+                                // Try the original send method with better error handling
+                                console.log('Using send method...');
+                                
+                                // Try using sendForm with a dummy form element
+                                const dummyForm = document.createElement('form');
+                                dummyForm.style.display = 'none';
+                                
+                                // Add form fields
+                                Object.keys(templateParams).forEach(key => {
+                                  const input = document.createElement('input');
+                                  input.type = 'hidden';
+                                  input.name = key;
+                                  input.value = templateParams[key as keyof typeof templateParams];
+                                  dummyForm.appendChild(input);
+                                });
+                                
+                                document.body.appendChild(dummyForm);
+                                
+                                try {
+                                  await emailjs.sendForm("service_xow6qoh", "template_n8dtcod", dummyForm, "n6jpUtOzTsP-7PWmk");
+                                  console.log('Email sent using sendForm method');
+                                } catch (sendFormError) {
+                                  console.log('sendForm failed, trying send method...');
+                                  try {
+                                    await emailjs.send("service_xow6qoh", "template_n8dtcod", templateParams);
+                                    console.log('Email sent using send method');
+                                  } catch (sendError) {
+                                    console.log('Both EmailJS methods failed, will use fallback');
+                                    throw sendError; // Re-throw to trigger fallback
+                                  }
+                                }
+                                
+                                // Clean up
+                                document.body.removeChild(dummyForm);
+                                console.log('Email sent to seller successfully');
+                                
+                              } catch (error: any) {
+                                console.error('EmailJS failed:', error);
+                                console.error('Error details:', {
+                                  message: error?.message,
+                                  stack: error?.stack,
+                                  name: error?.name
+                                });
+                                
+                                // Fallback: Open email client with pre-filled message
+                                console.log('Attempting fallback email method...');
+                                const subject = encodeURIComponent(`Your item "${item.item_name}" has been sold!`);
+                                const body = encodeURIComponent(`
+Hi ${item.user_name},
+
+Great news! Your item "${item.item_name}" has been sold to ${current_user_name} for $${item.item_price}.
+
+Buyer Details:
+- Name: ${current_user_name}
+- Email: ${current_user_email}
+- School: ${item.school_name || 'Not specified'}
+
+Please contact them to arrange payment and pickup.
+
+Best regards,
+TriDealz Team
+                                `);
+                                
+                                // Open default email client
+                                const mailtoUrl = `mailto:${item.user_email}?subject=${subject}&body=${body}`;
+                                console.log('Opening mailto URL:', mailtoUrl);
+                                window.open(mailtoUrl);
+                                console.log('Opened email client as fallback');
+                                
+                                // Continue with purchase even if email fails
+                              }
+                              
+                              // Navigate to buy page
                               const params = new URLSearchParams({
                                 item_id: item.item_id,
                                 item_name: item.item_name,

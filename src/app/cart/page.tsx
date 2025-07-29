@@ -26,6 +26,27 @@ export default function CartPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Initialize EmailJS once when component mounts
+  useEffect(() => {
+    const initEmailJS = () => {
+      try {
+        console.log('Checking if EmailJS is available...');
+        if (typeof emailjs !== 'undefined') {
+          console.log('EmailJS is available, initializing...');
+          emailjs.init("n6jpUtOzTsP-7PWmk");
+          console.log('EmailJS initialized successfully');
+        } else {
+          console.log('EmailJS not available yet, retrying in 1 second...');
+          setTimeout(initEmailJS, 1000);
+        }
+      } catch (error) {
+        console.error('Error initializing EmailJS:', error);
+      }
+    };
+    
+    initEmailJS();
+  }, []);
+
   useEffect(() => {
     if (!current_user_id) return;
     
@@ -230,11 +251,11 @@ export default function CartPage() {
                       updateSellerStats();
                       updateBuyerStats();
                       
-                                             // Send email to seller using EmailJS
+                                                                    // Send email to seller using EmailJS
                        try {
-                                                   // Initialize EmailJS with your public key
-                          emailjs.init("0cuSr3u8lY_VNz5ln", "https://api.emailjs.com"); // Add the API URL
-
+                         // Add a small delay to ensure EmailJS is fully initialized
+                         await new Promise(resolve => setTimeout(resolve, 1000));
+                         
                          const templateParams = {
                            to_email: item.seller_email,
                            to_name: item.seller_name,
@@ -244,18 +265,22 @@ export default function CartPage() {
                            item_price: item.item_price,
                            item_description: item.item_description || '',
                            school_name: item.school_name || 'Not specified',
-                          //  message: `Your item "${item.item_name}" has been sold to ${current_user_name} for $${item.item_price}. Please contact them at ${current_user_email} to arrange pickup.`
                          };
 
-                         await emailjs.send(
-                           'service_xow6qoh', // Replace with your EmailJS service ID
-                           'template_n8dtcod', // Replace with your EmailJS template ID
-                           templateParams
-                         );
+                         console.log('Sending email to seller...');
+                         console.log('Template params:', templateParams);
+                         
+                         // Check if EmailJS is properly initialized
+                         if (typeof emailjs === 'undefined') {
+                           throw new Error('EmailJS not available');
+                         }
 
+                                                   await emailjs.send('service_xow6qoh', 'template_n8dtcod', templateParams);
                          console.log('Email sent to seller successfully');
+                         
                        } catch (error) {
-                         console.error('Error sending email:', error);
+                         console.error('EmailJS failed:', error);
+                         // Continue with purchase even if email fails
                        }
                       
                       const { error: deleteItemError } = await supabase
