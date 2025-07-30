@@ -90,6 +90,39 @@ function BuyPageContent() {
         console.error('Error removing item:', error);
       }
     }
+    async function removeItemFromCart() {
+      try {
+        // First, get the cart item ID
+        const { data: cartItem, error: fetchError } = await supabase
+          .from('InCartItems')
+          .select('id')
+          .eq('all_items_db_id', item_id)
+          .eq('buyer_id', current_user_id)
+          .single();
+
+        if (fetchError) {
+          console.error('Error fetching cart item:', fetchError);
+          return;
+        }
+
+        if (cartItem) {
+          // Delete the cart item
+          const { error: deleteError } = await supabase
+            .from('InCartItems')
+            .delete()
+            .eq('id', cartItem.id);
+          
+          if (deleteError) {
+            console.error('Error removing item from cart:', deleteError);
+          } else {
+            console.log('Item removed from cart successfully');
+          }
+        }
+      } catch (error) {
+        console.error('Error in removeItemFromCart:', error);
+      }
+    }
+
 
     async function updateSellerStats() {
       const { data } = await supabase
@@ -138,6 +171,7 @@ function BuyPageContent() {
     }
 
     recordSale();
+    removeItemFromCart();
     removeItemFromMarketplace();
     updateSellerStats();
     updateBuyerStats();
