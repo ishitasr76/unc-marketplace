@@ -176,14 +176,15 @@ export default function CartPage() {
               
               <button
                 className="btn w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-lg hover:bg-primary/90"
-                onClick={() => {
+                onClick={async () => {
                   if (current_user_id === null) {
                     alert('Please login to purchase these items');
                     router.push('/login');
                     return;
                   }
                   else if (window.confirm('Please confirm purchase for these items')) {
-                    items.map(async (item) => {
+                    // Process all items sequentially to ensure proper deletion
+                    for (const item of items) {
                       const { error: insertError } = await supabase
                         .from("ItemsSold")
                         .insert({
@@ -319,14 +320,17 @@ TriDealz Team
                         console.error("Error deleting item:", deleteItemError);
                       }
                       
+                      // Delete this item from ALL users' carts (not just current buyer)
                       const { error: deleteCartError } = await supabase
                         .from("InCartItems")
                         .delete()
-                        .eq("id", item.id);
+                        .eq("all_items_db_id", item.all_items_db_id);
                       if (deleteCartError) {
-                        console.error("Error deleting item:", deleteCartError);
+                        console.error("Error deleting item from all carts:", deleteCartError);
+                      } else {
+                        console.log("Item removed from all users' carts");
                       }
-                    })
+                    }
                     alert("Items purchased successfully. Please check user tab for order details/stats");
                     router.push("/");
                   }
