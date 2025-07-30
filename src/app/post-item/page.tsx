@@ -78,7 +78,7 @@ export default function PostItemPage() {
       let pictureUrl = null;
       if (form.picture) {
         const { data, error } = await supabase.storage
-          .from("item-images")
+          .from("all-items-images")
           .upload(`pictures/${Date.now()}_${form.picture.name}`, form.picture);
   
         if (error) {
