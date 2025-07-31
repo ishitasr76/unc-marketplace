@@ -23,13 +23,21 @@ export default function SuppliesPage() {
   const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSchools, setSelectedSchools] = useState<string[]>(["all"]);
 
   useEffect(() => {
     const fetchItems = async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("Items")
         .select("item_id, item_name, item_category, item_price, item_picture, item_description, uploaded_date_time, user_id, user_name, user_email, school_name")
         .eq("item_category", "supplies");
+
+      // Add school filter if specific schools are selected (not "all")
+      if (!selectedSchools.includes("all") && selectedSchools.length > 0) {
+        query = query.in("school_name", selectedSchools);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching items:", error);
@@ -40,7 +48,7 @@ export default function SuppliesPage() {
     };
 
     fetchItems();
-  }, []);
+  }, [selectedSchools]);
 
   return (
     <div className="space-y-8">
@@ -54,6 +62,94 @@ export default function SuppliesPage() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             School and study supplies, electronics, and more.
           </p>
+        </div>
+      </div>
+
+      {/* School Filter */}
+      <div className="flex justify-center">
+        <div className="card bg-background rounded-xl border border-border p-6">
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-foreground text-center">Filter by School:</h3>
+            <div className="flex flex-wrap justify-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedSchools.includes("all")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedSchools(["all"]);
+                    } else {
+                      setSelectedSchools([]);
+                    }
+                  }}
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+                />
+                <span className="text-sm text-foreground">All Schools</span>
+              </label>
+              
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedSchools.includes("UNC Chapel Hill")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedSchools(prev => 
+                        prev.includes("all") 
+                          ? prev.filter(s => s !== "all").concat("UNC Chapel Hill")
+                          : prev.concat("UNC Chapel Hill")
+                      );
+                    } else {
+                      setSelectedSchools(prev => prev.filter(s => s !== "UNC Chapel Hill"));
+                    }
+                  }}
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+                />
+                <span className="text-sm text-foreground">UNC Chapel Hill</span>
+              </label>
+              
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedSchools.includes("NC State")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedSchools(prev => 
+                        prev.includes("all") 
+                          ? prev.filter(s => s !== "all").concat("NC State")
+                          : prev.concat("NC State")
+                      );
+                    } else {
+                      setSelectedSchools(prev => prev.filter(s => s !== "NC State"));
+                    }
+                  }}
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+                />
+                <span className="text-sm text-foreground">NC State</span>
+              </label>
+              
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedSchools.includes("Duke")}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedSchools(prev => 
+                        prev.includes("all") 
+                          ? prev.filter(s => s !== "all").concat("Duke")
+                          : prev.concat("Duke")
+                      );
+                    } else {
+                      setSelectedSchools(prev => prev.filter(s => s !== "Duke"));
+                    }
+                  }}
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2"
+                />
+                <span className="text-sm text-foreground">Duke</span>
+              </label>
+              
+             
+            </div>
+          </div>
         </div>
       </div>
 
