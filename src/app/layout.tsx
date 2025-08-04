@@ -65,6 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Link href="/category/class-materials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Class Materials</Link>
                 <Link href="/category/clothes" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Clothes</Link>
                 <Link href="/category/electronics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Electronics</Link>
+                <Link href="/category/other" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Other</Link>
               </div>
               
               <div className="flex items-center space-x-4">
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <Link href="/category/class-materials" className="hover:text-foreground transition-colors">Class Materials</Link>
                   <Link href="/category/clothes" className="hover:text-foreground transition-colors">Clothes</Link>
                   <Link href="/category/electronics" className="hover:text-foreground transition-colors">Electronics</Link>
+                  <Link href="/category/other" className="hover:text-foreground transition-colors">About</Link>
                 </div>
               </div>
             </div>

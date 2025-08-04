@@ -169,6 +169,20 @@ export default function Home() {
               </div>
             </div>
           </Link>
+
+          <Link href="/category/other" className="card group">
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 h-full border border-border hover:border-primary/20 transition-all">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined text-white text-xl">home</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg text-foreground mb-2">Other</h3>
+                  <p className="text-muted-foreground text-sm">Anything else you can think of.</p>
+                </div>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 

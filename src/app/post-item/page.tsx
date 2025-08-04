@@ -179,6 +179,7 @@ export default function PostItemPage() {
                   <option value="class-materials">Class Materials</option>
                   <option value="clothes">Clothes</option>
                   <option value="electronics">Electronics</option>
+                  <option value="other">Other</option>
                 </select>
               </div>
             </div>
