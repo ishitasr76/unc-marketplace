@@ -25,6 +25,7 @@ export default function ClassMaterialsPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSchools, setSelectedSchools] = useState<string[]>(["all"]);
+  const [sortBy, setSortBy] = useState<string>("default");
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -43,13 +44,37 @@ export default function ClassMaterialsPage() {
       if (error) {
         console.error("Error fetching items:", error);
       } else {
-        setItems(data || []);
+        let sortedData = data || [];
+        
+        // Apply sorting based on selected option
+        switch (sortBy) {
+          case "most-recent":
+            sortedData = sortedData.sort((a, b) => 
+              new Date(b.uploaded_date_time).getTime() - new Date(a.uploaded_date_time).getTime()
+            );
+            break;
+          case "price-low-high":
+            sortedData = sortedData.sort((a, b) => 
+              parseFloat(a.item_price) - parseFloat(b.item_price)
+            );
+            break;
+          case "price-high-low":
+            sortedData = sortedData.sort((a, b) => 
+              parseFloat(b.item_price) - parseFloat(a.item_price)
+            );
+            break;
+          default:
+            // Default sorting (no change)
+            break;
+        }
+        
+        setItems(sortedData);
       }
       setLoading(false);
     };
 
     fetchItems();
-  }, [selectedSchools]);
+  }, [selectedSchools, sortBy]);
 
   return (
     <div className="space-y-8">
@@ -66,9 +91,31 @@ export default function ClassMaterialsPage() {
         </div>
       </div>
 
-      {/* School Filter */}
+      {/* Sort and Filter Controls */}
       <div className="flex justify-center">
-        <div className="card bg-background rounded-xl border border-border p-6">
+        <div className="flex gap-6">
+          {/* Sort Dropdown */}
+          <div className="card bg-background rounded-xl border border-border p-4">
+            <div className="flex items-center gap-4">
+              <label htmlFor="sort-select" className="text-sm font-medium text-foreground">
+                Sort by:
+              </label>
+              <select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="default">Default</option>
+                <option value="most-recent">Most Recent</option>
+                <option value="price-low-high">Price: Low to High</option>
+                <option value="price-high-low">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
+          {/* School Filter */}
+          <div className="card bg-background rounded-xl border border-border p-6">
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-foreground text-center">Filter by School:</h3>
             <div className="flex flex-wrap justify-center gap-4">
@@ -152,6 +199,7 @@ export default function ClassMaterialsPage() {
           </div>
         </div>
       </div>
+    </div>
 
       {/* Items Grid */}
       {loading ? (
